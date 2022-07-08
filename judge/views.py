@@ -2,7 +2,7 @@ from django.utils import timezone
 import filecmp,os
 from django.http import HttpResponse,HttpResponseRedirect
 from .models import Problem,Solution,TestCase
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 
 def index(request):
     problem_list = Problem.objects.all
@@ -38,5 +38,9 @@ def submit(request, problem_id):
     solution.sub_code = sol.read()
     solution.save()
 
-    return HttpResponse(verdict)
+    return redirect('submissions')
 
+def submissions(request):
+    submission = Solution.objects.all()
+    context = {'submission': submission}
+    return render(request, 'judge/submissions.html', context)
