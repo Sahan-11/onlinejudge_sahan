@@ -1,9 +1,11 @@
+<h1 {align="centre"} >Problem Set</h1>
+<hr></hr>
 {% if problem_list %}
-    <ul>
+    <ol>
     {% for problem in problem_list %}
         <li><a href="/judge/{{ problem.id }}/">{{ problem.name }}</a></li>
     {% endfor %}
-    </ul>
+    </ol>
 {% else %}
     <p>No problems are available.</p>
 {% endif %}

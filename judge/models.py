@@ -10,6 +10,7 @@ class Solution(models.Model):
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
     verdict = models.CharField(max_length=200)
     sub_date = models.DateTimeField('date published') #submission date and time
+    sub_code = models.TextField(default='SOME STRING')
     
 class TestCase(models.Model):
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)

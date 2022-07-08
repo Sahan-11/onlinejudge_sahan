@@ -1,2 +1,31 @@
-<h1 {align="centre"} >{{ problem.name }}</h1>
-<p>{{ problem.statement}}</p>
+<!-- <h1 >{{ problem.name }}</h1>
+<body style="margin-left: 40px">
+    <h3>Problem Statement: </h3>
+    <p>{{ problem.statement}}</p>
+    <label for="lname">Code: </label><br><br/>
+    <textarea rows="30" cols="100">{{ problem.code}}</textarea><br><br/>
+    <input type="submit" value="Submit" style="margin-left: 40px">
+</body>
+ -->
+ <h1 align="center"> {{problem.id}}:{{problem.name}} </h1>
+    <p align="center">
+        input: standard input<br>
+        output: standard output<br>
+    </p>
+
+
+<p>
+    {{problem.statement}}
+</p>
+<form  action="{% url 'submit' problem.id %}" enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+    <fieldset>
+        <center><b>Submit your code<b></center>
+        <HR>
+        <div align="center">
+            <input type="file" id="solution" name="solution">
+            <!-- <textarea rows="30" cols="100">{{ problem.code}}</textarea><br><br/> -->
+            <input type="submit" value="Submit">
+        </div>
+    </fieldset>
+</form>
