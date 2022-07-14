@@ -21,6 +21,7 @@
                 <th scope="col">S. No:</th>
                 <th scope="col">Problem</th>
                 <th scope="col">Verdict</th>
+                <th scope="col">Language</th>
                 <th scope="col">Submission time</th>
             </tr>
             </thead>
@@ -30,6 +31,7 @@
                         <td>{{ forloop.counter }}</td>
                         <td>{{ item.problem.name }}</td>
                         <td>{{ item.verdict }}</td>
+                        <td>{{ item.lang }}</td>
                         <td>{{ item.sub_date }}</td>
                     </tr>
                 {% endfor %}

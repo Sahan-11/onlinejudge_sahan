@@ -83,16 +83,24 @@ def detail(request, problem_id):
 def submit(request, problem_id):
     code=request.POST.get('solution')
     language=request.POST.get('language')
-    sol = open('/Users/sahan/Desktop/Project/solution.cpp', "wb+")
-    sol.write(str.encode(code))
-    sol.seek(0)
+    print(language)
+    sol_cpp = open('/Users/sahan/Desktop/Project/solution.cpp', "wb+")
+    sol_py = open('/Users/sahan/Desktop/Project/solution.py', "wb+")
+    if (language == "C++"):
+        sol_cpp.write(str.encode(code))
+        sol_cpp.seek(0)
+    elif(language == "Python"):
+         sol_py.write(str.encode(code))
+         sol_py.seek(0)
+
     # temp_Solution = tempfile.NamedTemporaryFile(suffix=".cpp")
     # temp_Solution.write(str.encode(code))
     # temp_Solution.seek(0)
     # temp_Solution.close()
     problem = get_object_or_404(Problem, pk=problem_id)
     testcase = problem.testcase_set.all()
-    os.system('g++ /Users/sahan/Desktop/Project/solution.cpp')
+    if (language == "C++"):
+        os.system('g++ /Users/sahan/Desktop/Project/solution.cpp')
     # verdict = 'Accepted'
     for i in testcase:
         # temporary input file 
@@ -111,7 +119,10 @@ def submit(request, problem_id):
         # output file which we get after running the code
         # tempOutput = tempfile.NamedTemporaryFile(suffix=".txt")
         # tempOutput.seek(0)
-        os.system('a.exe < /Users/sahan/Desktop/Project/inp.txt > /Users/sahan/Desktop/Project/out.txt')
+        if (language == "C++"):
+            os.system('a.exe < /Users/sahan/Desktop/Project/inp.txt > /Users/sahan/Desktop/Project/out.txt')
+        elif (language == "Python"):
+            os.system('python /Users/sahan/Desktop/Project/solution.py < /Users/sahan/Desktop/Project/inp.txt > /Users/sahan/Desktop/Project/out.txt ')
         # os.system('a.exe < ' + tempInput.name + ' > ' + tempOutput.name) 
         # out = open('/Users/sahan/Desktop/Project/out.txt',"wb+")
 
@@ -148,7 +159,9 @@ def submit(request, problem_id):
     solution.verdict = verdict
     solution.sub_date = timezone.now()
     solution.sub_code = code
-    sol.close()
+    solution.lang = language
+    sol_cpp.close()
+    sol_py.close()
     solution.save()
 
     return redirect('submissions')

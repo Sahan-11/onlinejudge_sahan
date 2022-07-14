@@ -9,6 +9,7 @@ class Problem(models.Model):
 class Solution(models.Model):
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE)
     verdict = models.CharField(max_length=200)
+    lang = models.CharField(max_length=50, default='C++')
     sub_date = models.DateTimeField('date published') #submission date and time
     sub_code = models.TextField(default='SOME STRING')
     
