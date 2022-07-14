@@ -4,12 +4,50 @@ import filecmp,os,shutil
 from django.http import HttpResponse,HttpResponseRedirect
 from .models import Problem,Solution,TestCase
 from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate,login,logout
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .forms import CreateUserForm
 
+def registerPage(request):
+    form = CreateUserForm()
+    if request.method == 'POST':
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            user = form.cleaned_data.get('username')
+            messages.success(request, 'Account created successfully for '+ user )
+            return redirect('login')
+    context = {'form' : form}
+    return render(request, 'judge/register.html', context)
+
+def loginPage(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('index')
+        else:
+            messages.info(request, 'Username or password is incorrect')
+
+		
+    context={}
+    return render(request, 'judge/login.html', context)
+
+def logoutUser(request):
+	logout(request)
+	return redirect('login')
+
+@login_required(login_url='login')
 def index(request):
     problem_list = Problem.objects.all
     context = {'problem_list': problem_list}
     return render(request, 'judge/index.html', context)
 
+@login_required(login_url='login')
 def detail(request, problem_id):
     problem = get_object_or_404(Problem, pk=problem_id)
     return render(request, 'judge/detail.html', {'problem': problem})
@@ -41,6 +79,7 @@ def detail(request, problem_id):
 
 #     return redirect('submissions')
 
+@login_required(login_url='login')
 def submit(request, problem_id):
     code=request.POST.get('solution')
     language=request.POST.get('language')
@@ -114,7 +153,7 @@ def submit(request, problem_id):
 
     return redirect('submissions')
 
-
+@login_required(login_url='login')
 def submissions(request):
     submission = Solution.objects.all().order_by('-sub_date')
     context = {'submission': submission}

@@ -1,12 +1,6 @@
-<!-- <h1 >{{ problem.name }}</h1>
-<body style="margin-left: 40px">
-    <h3>Problem Statement: </h3>
-    <p>{{ problem.statement}}</p>
-    <label for="lname">Code: </label><br><br/>
-    <textarea rows="30" cols="100">{{ problem.code}}</textarea><br><br/>
-    <input type="submit" value="Submit" style="margin-left: 40px">
-</body>
- -->
+ {%  extends 'judge/main.html' %}
+
+ {% block content %}
  <h1 align="center"> {{problem.id}}:{{problem.name}} </h1>
     <p align="center">
         input: standard input<br>
@@ -30,8 +24,11 @@
                 <option id="python" name="python">Python</option>
             </select>
             <br></br>
-            <textarea rows="30" cols="100" id="solution" name="solution">{{ problem.code}}</textarea><br><br/>
+            <textarea rows="20" cols="100" id="solution" name="solution">{{ problem.code}}</textarea><br><br/>
             <input type="submit"  value="Submit">
+            <br></br>
         </div>
     </fieldset>
 </form>
+
+{% endblock %}
