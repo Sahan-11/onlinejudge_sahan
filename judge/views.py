@@ -89,22 +89,22 @@ def submit(request, problem_id):
     sol_cpp = open('/Users/sahan/Desktop/Django/algo_oj/Project/solution.cpp', "wb+")
     sol_py = open('/Users/sahan/Desktop/Django/algo_oj/Project/solution.py', "wb+")
     temp_py = tempfile.NamedTemporaryFile(suffix=".py", dir='.')
-
+    temp_cpp = tempfile.NamedTemporaryFile(suffix=".cpp", dir='.')
+    # if (language == "C++"):
+    #     sol_cpp.write(str.encode(code))
+    #     sol_cpp.seek(0)
+    # elif(language == "Python"):
+    #      sol_py.write(str.encode(code))
+    #      sol_py.seek(0)
     if (language == "C++"):
-        sol_cpp.write(str.encode(code))
-        sol_cpp.seek(0)
+        temp_cpp.write(str.encode(code))
+        temp_cpp.seek(0)
+        temp_py.close()     
     elif(language == "Python"):
-         sol_py.write(str.encode(code))
-         sol_py.seek(0)
-    if(language == "Python"):
         temp_py.write(str.encode(code))
         temp_py.seek(0)
+        temp_cpp.close()
         
-
-    # temp_Solution = tempfile.NamedTemporaryFile(suffix=".cpp")
-    # temp_Solution.write(str.encode(code))
-    # temp_Solution.seek(0)
-    # temp_Solution.close()
     s = subprocess.check_output('docker ps', shell=True)
     strPath = os.getcwd()
     print(strPath)
@@ -118,29 +118,30 @@ def submit(request, problem_id):
     problem = get_object_or_404(Problem, pk=problem_id)
     testcase = problem.testcase_set.all()
     if (language == "C++"):
-         subprocess.run('docker exec gcc g++ /home/Project/solution.cpp', shell=True)
+         subprocess.run('docker exec gcc g++ /home/'+ os.path.basename(temp_cpp.name), shell=True)
 
     for i in testcase:
+        
         # temporary input file 
-        # tempInput = tempfile.NamedTemporaryFile(suffix=".txt")
+        # tempInput = tempfile.NamedTemporaryFile(suffix=".txt", dir='.')
         # tempInput.write(str.encode(i.input))
         # tempInput.seek(0)
         inp = open('/Users/sahan/Desktop/Django/algo_oj/Project/inp.txt',"wb+")
         inp.write(str.encode(i.input))
         inp.seek(0)
         # temporary actual output file 
-        # tempActualOutput = tempfile.NamedTemporaryFile(suffix=".txt")
+        # tempActualOutput = tempfile.NamedTemporaryFile(suffix=".txt", dir='.')
         # tempActualOutput.write(str.encode(i.output))
         actual_out = open('/Users/sahan/Desktop/Django/algo_oj/Project/actual_out.txt',"wb+")
         actual_out.write(str.encode(i.output))
         actual_out.seek(0)
         # output file which we get after running the code
-        # tempOutput = tempfile.NamedTemporaryFile(suffix=".txt")
+        # tempOutput = tempfile.NamedTemporaryFile(suffix=".txt", dir='.')
         # tempOutput.seek(0)
         if (language == "C++"):
              subprocess.run('docker exec -i gcc ./a.out < /Users/sahan/Desktop/Django/algo_oj/Project/inp.txt > /Users/sahan/Desktop/Django/algo_oj/Project/out.txt', shell=True)
         elif (language == "Python"):
-            subprocess.run('docker exec -i python python /home/Project/solution.py < /Users/sahan/Desktop/Django/algo_oj/Project/inp.txt > /Users/sahan/Desktop/Django/algo_oj/Project/out.txt ', shell=True)
+             subprocess.run("docker exec -i python python /home/"+ os.path.basename(temp_py.name)+ ' < /Users/sahan/Desktop/Django/algo_oj/Project/inp.txt > /Users/sahan/Desktop/Django/algo_oj/Project/out.txt ', shell=True)
         
         # out = open('/Users/sahan/Desktop/Django/algo_oj/Project/out.txt',"wb+")
 
@@ -150,8 +151,10 @@ def submit(request, problem_id):
         # verdict = 'Accepted'
         actual_outstring=""
         outstring=""
+        # print(outstring)
         out1 = '/Users/sahan/Desktop/Django/algo_oj/Project/out.txt'
         out2 = '/Users/sahan/Desktop/Django/algo_oj/Project/actual_out.txt'
+        
         with open(out1,'r') as var:
             for line in var:
                 line=line.replace('/r',' ')
@@ -169,8 +172,11 @@ def submit(request, problem_id):
         else:
             verdict = 'Wrong Answer'
         
-        actual_out.close()
-        inp.close()
+
+    if (language == "C++"):
+        temp_cpp.close()
+    elif (language == "Python"):
+        temp_py.close()    
 
     solution = Solution()
     solution.problem = Problem.objects.get(pk=problem_id)
