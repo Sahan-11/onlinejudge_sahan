@@ -88,22 +88,38 @@ def submit(request, problem_id):
     print(language)
     sol_cpp = open('/Users/sahan/Desktop/Django/algo_oj/Project/solution.cpp', "wb+")
     sol_py = open('/Users/sahan/Desktop/Django/algo_oj/Project/solution.py', "wb+")
+    temp_py = tempfile.NamedTemporaryFile(suffix=".py", dir='.')
+
     if (language == "C++"):
         sol_cpp.write(str.encode(code))
         sol_cpp.seek(0)
     elif(language == "Python"):
          sol_py.write(str.encode(code))
          sol_py.seek(0)
+    if(language == "Python"):
+        temp_py.write(str.encode(code))
+        temp_py.seek(0)
+        
 
     # temp_Solution = tempfile.NamedTemporaryFile(suffix=".cpp")
     # temp_Solution.write(str.encode(code))
     # temp_Solution.seek(0)
     # temp_Solution.close()
+    s = subprocess.check_output('docker ps', shell=True)
+    strPath = os.getcwd()
+    print(strPath)
+    if (language == "C++"):
+        if s.find(str.encode('gcc')) == -1:
+            subprocess.run(f'docker run -d -it --name gcc -v {strPath}:/home/:ro gcc', shell=True)
+    if (language == "Python"):
+        if s.find(str.encode('python')) == -1:
+            subprocess.run(f'docker run -d -it --name python -v {strPath}:/home/:ro python', shell=True)     
+
     problem = get_object_or_404(Problem, pk=problem_id)
     testcase = problem.testcase_set.all()
     if (language == "C++"):
-        os.system('g++ /Users/sahan/Desktop/Django/algo_oj/Project/solution.cpp')
-    # verdict = 'Accepted'
+         subprocess.run('docker exec gcc g++ /home/Project/solution.cpp', shell=True)
+
     for i in testcase:
         # temporary input file 
         # tempInput = tempfile.NamedTemporaryFile(suffix=".txt")
@@ -122,10 +138,10 @@ def submit(request, problem_id):
         # tempOutput = tempfile.NamedTemporaryFile(suffix=".txt")
         # tempOutput.seek(0)
         if (language == "C++"):
-            os.system('a.exe < /Users/sahan/Desktop/Django/algo_oj/Project/inp.txt > /Users/sahan/Desktop/Django/algo_oj/Project/out.txt')
+             subprocess.run('docker exec -i gcc ./a.out < /Users/sahan/Desktop/Django/algo_oj/Project/inp.txt > /Users/sahan/Desktop/Django/algo_oj/Project/out.txt', shell=True)
         elif (language == "Python"):
-            os.system('python /Users/sahan/Desktop/Django/algo_oj/Project/solution.py < /Users/sahan/Desktop/Django/algo_oj/Project/inp.txt > /Users/sahan/Desktop/Django/algo_oj/Project/out.txt ')
-        # os.system('a.exe < ' + tempInput.name + ' > ' + tempOutput.name) 
+            subprocess.run('docker exec -i python python /home/Project/solution.py < /Users/sahan/Desktop/Django/algo_oj/Project/inp.txt > /Users/sahan/Desktop/Django/algo_oj/Project/out.txt ', shell=True)
+        
         # out = open('/Users/sahan/Desktop/Django/algo_oj/Project/out.txt',"wb+")
 
         # print("actual_out")

@@ -1,3 +1,3 @@
-n=int(input())
-for i in range(0, n):
+n = int(input())
+for x in range(n):
     print("Test Problem")
